@@ -3,6 +3,7 @@ package repository;
 import exceptions.NullValueException;
 import model.Course;
 
+import javax.xml.transform.Result;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -148,5 +149,37 @@ public class CourseJdbcRepository extends JdbcRepository<Course> {
 
         closeConnection(connection);
         return entity;
+    }
+
+    /**
+     * returns the number of credits for a given course
+     *
+     * @param courseId the course for which credits are returned
+     * @return the number of credits
+     * @throws SQLException (getConnection) if a database access error occurs or the url is null
+     * @throws IOException (load) if an error occurred when reading from the input stream
+     * @throws ClassNotFoundException (forName) if the class cannot be located
+     */
+    public Long getCreditsOfCourse(Long courseId) throws SQLException, IOException, ClassNotFoundException {
+        Connection connection = openConnection();
+
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT credits FROM courses WHERE id = ?"
+        );
+        statement.setLong(1, courseId);
+
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            long credits = resultSet.getLong("credits");
+            statement.close();
+            resultSet.close();
+            connection.close();
+            return credits;
+        }
+
+        statement.close();
+        resultSet.close();
+        connection.close();
+        return null;
     }
 }
