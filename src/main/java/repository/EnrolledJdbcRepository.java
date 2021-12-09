@@ -2,6 +2,7 @@ package repository;
 
 import exceptions.InvalidCourseException;
 import exceptions.InvalidStudentException;
+import exceptions.InvalidTeacherException;
 import exceptions.NullValueException;
 import model.Course;
 
@@ -16,10 +17,12 @@ import java.util.List;
 public class EnrolledJdbcRepository {
     StudentJdbcRepository studentJdbcRepo;
     CourseJdbcRepository courseJdbcRepo;
+    TeacherJdbcRepository teacherJdbcRepo;
 
-    public EnrolledJdbcRepository(StudentJdbcRepository studentJdbcRepo, CourseJdbcRepository courseJdbcRepo) {
+    public EnrolledJdbcRepository(StudentJdbcRepository studentJdbcRepo, CourseJdbcRepository courseJdbcRepo, TeacherJdbcRepository teacherJdbcRepo) {
         this.studentJdbcRepo = studentJdbcRepo;
         this.courseJdbcRepo = courseJdbcRepo;
+        this.teacherJdbcRepo = teacherJdbcRepo;
     }
 
     /**
@@ -173,6 +176,27 @@ public class EnrolledJdbcRepository {
     }
 
     /**
+     * deletes the enrollments for a given student
+     *
+     * @param studentId the id of the student for which the enrollments will be deleted
+     * @throws SQLException           (getConnection) if a database access error occurs or the url is null
+     * @throws IOException            (load) if an error occurred when reading from the input stream
+     * @throws ClassNotFoundException (forName) if the class cannot be located
+     */
+    public void deleteCoursesAttendedByStudent(Long studentId) throws SQLException, IOException, ClassNotFoundException {
+        Connection connection = studentJdbcRepo.openConnection();
+
+        PreparedStatement statement = connection.prepareStatement(
+                "DELETE FROM studentsCourses WHERE idStudent=?"
+        );
+        statement.setLong(1, studentId);
+        statement.execute();
+
+        statement.close();
+        studentJdbcRepo.closeConnection(connection);
+    }
+
+    /**
      * deletes the enrollment of a given student in a given course
      *
      * @param studentId the id of the student for which the enrollment will be deleted
@@ -191,6 +215,61 @@ public class EnrolledJdbcRepository {
         statement.setLong(2, courseId);
         statement.executeUpdate();
 
+        statement.close();
+        courseJdbcRepo.closeConnection(connection);
+    }
+
+    /**
+     * sets the teacher id of a course to NULL before the teacher is deleted from the database
+     *
+     * @param teacherId the id of the student who will be deleted
+     * @throws SQLException           (getConnection) if a database access error occurs or the url is null
+     * @throws IOException            (load) if an error occurred when reading from the input stream
+     * @throws ClassNotFoundException (forName) if the class cannot be located
+     */
+    public void deleteTeacherFromCourse(Long teacherId) throws SQLException, IOException, ClassNotFoundException {
+        Connection connection = courseJdbcRepo.openConnection();
+
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE courses SET teacherId=NULL WHERE teacherId=?"
+        );
+        statement.setLong(1, teacherId);
+        statement.executeUpdate();
+
+        statement.close();
+        courseJdbcRepo.closeConnection(connection);
+    }
+
+    /**
+     * sets the teacher of a course
+     *
+     * @param teacherId the id of the teacher who teaches the course
+     * @param courseId the id of the course
+     * @throws NullValueException      if the parameter object is null
+     * @throws SQLException            (getConnection) if a database access error occurs or the url is null
+     * @throws IOException             (load) if an error occurred when reading from the input stream
+     * @throws ClassNotFoundException  (forName) if the class cannot be located
+     * @throws InvalidTeacherException will be thrown when the id of the teacher doesn't exist in studentRepository
+     * @throws InvalidCourseException  will be thrown when the id of the course doesn't exist in courseRepository
+     */
+    public void registerTeacherToCourse(Long teacherId, Long courseId) throws NullValueException, SQLException, IOException, ClassNotFoundException, InvalidTeacherException, InvalidCourseException {
+        if (teacherId == null || courseId == null)
+            throw new NullValueException("Invalid entity");
+
+        Connection connection = courseJdbcRepo.openConnection();
+
+        if (teacherJdbcRepo.findOne(teacherId) == null)
+            throw new InvalidTeacherException("Invalid teacher");
+        if (courseJdbcRepo.findOne(courseId) == null)
+            throw new InvalidCourseException("Invalid course");
+
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE courses SET teacherId=? WHERE id=?"
+        );
+        statement.setLong(1, teacherId);
+        statement.setLong(2, courseId);
+
+        statement.executeUpdate();
         statement.close();
         courseJdbcRepo.closeConnection(connection);
     }

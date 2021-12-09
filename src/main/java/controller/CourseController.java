@@ -42,6 +42,7 @@ public class CourseController {
      */
     public List<Course> sortCoursesByStudentsEnrolled() throws SQLException, IOException, ClassNotFoundException {
         Connection connection = courseJdbcRepo.openConnection();
+
         List<Course> courses = courseJdbcRepo.readDataFromDatabase(connection).stream()
                 .sorted((course, otherCourse) -> {
                     try {
@@ -56,6 +57,7 @@ public class CourseController {
                     return 0;
                 })
                 .collect(Collectors.toList());
+
         courseJdbcRepo.closeConnection(connection);
         return courses;
     }
@@ -70,9 +72,12 @@ public class CourseController {
     public List<Course> filterCoursesWithSpecifiedCredits(int credits) throws SQLException, IOException, ClassNotFoundException {
         Connection connection = courseJdbcRepo.openConnection();
 
-        return courseJdbcRepo.readDataFromDatabase(connection).stream()
+        List<Course> courses = courseJdbcRepo.readDataFromDatabase(connection).stream()
                 .filter(course -> course.getCredits() == credits)
                 .collect(Collectors.toList());
+
+        courseJdbcRepo.closeConnection(connection);
+        return courses;
     }
 
     public Course findOne(Long id) throws NullValueException, SQLException, IOException, ClassNotFoundException {
@@ -137,5 +142,17 @@ public class CourseController {
 
     public int size() throws SQLException, IOException, ClassNotFoundException {
         return courseJdbcRepo.size();
+    }
+
+    public void registerStudentToCourse(Long studentId, Long courseId) throws Exception {
+        enrolledJdbcRepo.registerStudentToCourse(studentId, courseId);
+    }
+
+    public List<Long> getStudentsEnrolledInCourse(Course course) throws SQLException, IOException, ClassNotFoundException {
+        return enrolledJdbcRepo.getStudentsEnrolledInCourse(course);
+    }
+
+    public void registerTeacherToCourse(Long teacherId, Long courseId) throws SQLException, IOException, ClassNotFoundException, NullValueException, InvalidTeacherException, InvalidCourseException {
+        enrolledJdbcRepo.registerTeacherToCourse(teacherId, courseId);
     }
 }

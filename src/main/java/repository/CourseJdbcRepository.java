@@ -3,7 +3,6 @@ package repository;
 import exceptions.NullValueException;
 import model.Course;
 
-import javax.xml.transform.Result;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

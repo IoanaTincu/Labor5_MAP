@@ -1,7 +1,6 @@
 package repository;
 
 import exceptions.NullValueException;
-import javafx.util.Pair;
 import model.Student;
 
 import java.io.IOException;
