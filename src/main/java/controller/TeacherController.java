@@ -1,26 +1,19 @@
 package controller;
 
-import exceptions.InvalidCourseException;
 import exceptions.NullValueException;
-import model.Course;
 import model.Teacher;
-import repository.CourseJdbcRepository;
-import repository.EnrolledJdbcRepository;
-import repository.TeacherJdbcRepository;
+import repository.*;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TeacherController {
 
-    private TeacherJdbcRepository teacherJdbcRepo;
-    private EnrolledJdbcRepository enrolledJdbcRepo;
+    private final ICrudRepository<Teacher> teacherJdbcRepo;
+    private final IJoinTablesRepo enrolledJdbcRepo;
 
-    public TeacherController(TeacherJdbcRepository teacherJdbcRepo, EnrolledJdbcRepository enrolledJdbcRepo) {
+    public TeacherController(ICrudRepository<Teacher> teacherJdbcRepo, IJoinTablesRepo enrolledJdbcRepo) {
         this.teacherJdbcRepo = teacherJdbcRepo;
         this.enrolledJdbcRepo = enrolledJdbcRepo;
     }
@@ -45,8 +38,7 @@ public class TeacherController {
         if (teacher == null)
             throw new NullValueException("Invalid entity");
 
-        Teacher result = teacherJdbcRepo.save(teacher);
-        return result;
+        return teacherJdbcRepo.save(teacher);
     }
 
     /**
@@ -64,7 +56,7 @@ public class TeacherController {
 
         Teacher result = teacherJdbcRepo.findOne(id);
         if (result == null)
-            return result;
+            return null;
 
         enrolledJdbcRepo.deleteTeacherFromCourse(id);
         teacherJdbcRepo.delete(id);

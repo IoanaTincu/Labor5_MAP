@@ -5,13 +5,9 @@ import exceptions.InvalidStudentException;
 import exceptions.InvalidTeacherException;
 import exceptions.NullValueException;
 import model.Course;
-import model.Student;
 import model.Teacher;
-import repository.CourseJdbcRepository;
+import repository.*;
 import org.mockito.Mockito;
-import repository.EnrolledJdbcRepository;
-import repository.StudentJdbcRepository;
-import repository.TeacherJdbcRepository;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -25,10 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class CourseControllerTest {
 
     CourseController courseController;
-    CourseJdbcRepository courseJdbcRepo = Mockito.mock(CourseJdbcRepository.class);
-    StudentJdbcRepository studentJdbcRepo = Mockito.mock(StudentJdbcRepository.class);
-    TeacherJdbcRepository teacherJdbcRepo = Mockito.mock(TeacherJdbcRepository.class);
-    EnrolledJdbcRepository enrolledJdbcRepo = Mockito.mock(EnrolledJdbcRepository.class);
+    ICrudRepository<Course> courseJdbcRepo = Mockito.mock(CourseJdbcRepository.class);
+    ICrudRepository<Teacher> teacherJdbcRepo = Mockito.mock(TeacherJdbcRepository.class);
+    IJoinTablesRepo enrolledJdbcRepo = Mockito.mock(EnrolledJdbcRepository.class);
     Course course1 = new Course(1141, "Algebra liniara", 1200, 45, 18);
     Course course2 = new Course(653, "Analiza matematica", 1200, 45, 11);
     Course course3 = new Course(807, "Programare distribuita", 120, 88, 8);
@@ -44,7 +39,7 @@ class CourseControllerTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() throws SQLException, IOException, ClassNotFoundException, NullValueException {
-        courseController = new CourseController(courseJdbcRepo, studentJdbcRepo, teacherJdbcRepo, enrolledJdbcRepo);
+        courseController = new CourseController(courseJdbcRepo, teacherJdbcRepo, enrolledJdbcRepo);
         Mockito.when(courseJdbcRepo.save(null)).thenThrow(NullValueException.class);
         Mockito.when(courseJdbcRepo.save(course4)).thenThrow(InvalidTeacherException.class);
         Mockito.when(teacherJdbcRepo.findOne(1200L)).thenReturn(teacher);
@@ -108,7 +103,7 @@ class CourseControllerTest {
 
     @org.junit.jupiter.api.Test
     @Description("Should throw a NullValueException because the parameter course is null")
-    void delete_course_null() throws IOException, SQLException, ClassNotFoundException, NullValueException {
+    void delete_course_null() {
         assertThrows(NullValueException.class, () -> courseController.delete(null));
     }
 
@@ -120,7 +115,7 @@ class CourseControllerTest {
 
     @org.junit.jupiter.api.Test
     @Description("Should return the course because it has been removed from the repoList")
-    void delete_course_exists() throws IOException, InvalidTeacherException, InvalidStudentException, NullValueException, SQLException, ClassNotFoundException {
+    void delete_course_exists() throws IOException, NullValueException, SQLException, ClassNotFoundException {
         Course course = courseController.findOne(1141L);
         assertEquals(courseController.delete(1141L), course);
     }

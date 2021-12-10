@@ -50,7 +50,6 @@ public abstract class JdbcRepository<T> implements ICrudRepository<T> {
      *
      * @return a list with the objects from the database
      */
-    abstract List<T> readDataFromDatabase(Connection connection) throws SQLException, IOException, ClassNotFoundException;
 
 
     @Override

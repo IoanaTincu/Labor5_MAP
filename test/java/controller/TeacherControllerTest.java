@@ -1,7 +1,6 @@
 package controller;
 
 import com.sun.org.glassfish.gmbal.Description;
-import exceptions.InvalidCourseException;
 import exceptions.NullValueException;
 import model.Teacher;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,19 +41,19 @@ class TeacherControllerTest {
 
     @Test
     @Description("Should return the teacher because the id already exists in the repository")
-    void save_teacher_id_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException, InvalidCourseException {
+    void save_teacher_id_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException {
         assertEquals(teacherController.save(teacher1), teacher1);
     }
 
     @Test
     @Description("Should return null because the teacher has been saved")
-    void save_teacher_not_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException, InvalidCourseException {
+    void save_teacher_not_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException {
         assertNull(teacherController.save(teacher3));
     }
 
     @Test
     @Description("Should throw a NullValueException because the parameter teacher is null")
-    void delete_teacher_null() throws IOException {
+    void delete_teacher_null() {
         assertThrows(NullValueException.class, () -> teacherController.delete(null));
     }
 

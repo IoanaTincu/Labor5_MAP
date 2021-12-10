@@ -4,9 +4,7 @@ import exceptions.InvalidCourseException;
 import exceptions.NullValueException;
 import model.Course;
 import model.Student;
-import repository.CourseJdbcRepository;
-import repository.EnrolledJdbcRepository;
-import repository.StudentJdbcRepository;
+import repository.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -17,11 +15,11 @@ import java.util.stream.Collectors;
 
 public class StudentController {
 
-    private StudentJdbcRepository studentJdbcRepo;
-    private CourseJdbcRepository courseJdbcRepo;
-    private EnrolledJdbcRepository enrolledJdbcRepo;
+    private final ICrudRepository<Student> studentJdbcRepo;
+    private final ICrudRepository<Course> courseJdbcRepo;
+    private final IJoinTablesRepo enrolledJdbcRepo;
 
-    public StudentController(StudentJdbcRepository studentJdbcRepo, CourseJdbcRepository courseJdbcRepo, EnrolledJdbcRepository enrolledJdbcRepo) {
+    public StudentController(ICrudRepository<Student> studentJdbcRepo, ICrudRepository<Course> courseJdbcRepo, IJoinTablesRepo enrolledJdbcRepo) {
         this.studentJdbcRepo = studentJdbcRepo;
         this.courseJdbcRepo = courseJdbcRepo;
         this.enrolledJdbcRepo = enrolledJdbcRepo;
@@ -58,11 +56,7 @@ public class StudentController {
                 .filter(student -> {
                     try {
                         return enrolledJdbcRepo.getStudentsEnrolledInCourse(course).contains(student.getId());
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                    } catch (SQLException | IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                     return false;
@@ -92,14 +86,13 @@ public class StudentController {
      * @return result of method save in PersonRepository<T>
      * @throws NullValueException     if the parameter object is null
      * @throws IOException            if the file is invalid
-     * @throws InvalidCourseException student has a course in courseList that doesn't exist in courseRepolist
+     * @throws InvalidCourseException student has a course in courseList that doesn't exist in courseRepoList
      */
     public Student save(Student student) throws NullValueException, IOException, InvalidCourseException, SQLException, ClassNotFoundException {
         if (student == null)
             throw new NullValueException("Invalid entity");
 
-        Student result = studentJdbcRepo.save(student);
-        return result;
+        return studentJdbcRepo.save(student);
     }
 
     /**
@@ -117,7 +110,7 @@ public class StudentController {
 
         Student result = studentJdbcRepo.findOne(id);
         if (result == null)
-            return result;
+            return null;
 
         enrolledJdbcRepo.deleteCoursesAttendedByStudent(id);
         studentJdbcRepo.delete(id);

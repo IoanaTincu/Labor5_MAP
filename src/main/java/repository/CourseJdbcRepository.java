@@ -14,7 +14,7 @@ import java.util.List;
 public class CourseJdbcRepository extends JdbcRepository<Course> {
 
     @Override
-    public List<Course> readDataFromDatabase(Connection connection) throws SQLException, IOException, ClassNotFoundException {
+    public List<Course> readDataFromDatabase(Connection connection) {
         List<Course> databaseCourses = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM courses");
@@ -150,35 +150,4 @@ public class CourseJdbcRepository extends JdbcRepository<Course> {
         return entity;
     }
 
-    /**
-     * returns the number of credits for a given course
-     *
-     * @param courseId the course for which credits are returned
-     * @return the number of credits
-     * @throws SQLException (getConnection) if a database access error occurs or the url is null
-     * @throws IOException (load) if an error occurred when reading from the input stream
-     * @throws ClassNotFoundException (forName) if the class cannot be located
-     */
-    public Long getCreditsOfCourse(Long courseId) throws SQLException, IOException, ClassNotFoundException {
-        Connection connection = openConnection();
-
-        PreparedStatement statement = connection.prepareStatement(
-                "SELECT credits FROM courses WHERE id = ?"
-        );
-        statement.setLong(1, courseId);
-
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            long credits = resultSet.getLong("credits");
-            statement.close();
-            resultSet.close();
-            connection.close();
-            return credits;
-        }
-
-        statement.close();
-        resultSet.close();
-        connection.close();
-        return null;
-    }
 }

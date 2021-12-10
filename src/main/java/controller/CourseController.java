@@ -5,35 +5,27 @@ import exceptions.InvalidStudentException;
 import exceptions.InvalidTeacherException;
 import exceptions.NullValueException;
 import model.Course;
-import model.Student;
 import model.Teacher;
-import repository.CourseJdbcRepository;
-import repository.EnrolledJdbcRepository;
-import repository.StudentJdbcRepository;
-import repository.TeacherJdbcRepository;
+import repository.*;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CourseController {
 
-    private CourseJdbcRepository courseJdbcRepo;
-    private StudentJdbcRepository studentJdbcRepo;
-    private TeacherJdbcRepository teacherJdbcRepo;
-    private EnrolledJdbcRepository enrolledJdbcRepo;
+    private final ICrudRepository<Course> courseJdbcRepo;
+    private final ICrudRepository<Teacher> teacherJdbcRepo;
+    private final IJoinTablesRepo enrolledJdbcRepo;
 
-    public CourseController(CourseJdbcRepository courseJdbcRepo, StudentJdbcRepository studentJdbcRepo, TeacherJdbcRepository teacherJdbcRepo, EnrolledJdbcRepository enrolledJdbcRepo) {
+    public CourseController(ICrudRepository<Course> courseJdbcRepo, ICrudRepository<Teacher> teacherJdbcRepo, IJoinTablesRepo enrolledJdbcRepo) {
         this.courseJdbcRepo = courseJdbcRepo;
-        this.studentJdbcRepo = studentJdbcRepo;
         this.teacherJdbcRepo = teacherJdbcRepo;
         this.enrolledJdbcRepo = enrolledJdbcRepo;
     }
+
 
     /**
      * sorts courses descending by the number of enrolled students
@@ -47,11 +39,7 @@ public class CourseController {
                 .sorted((course, otherCourse) -> {
                     try {
                         return enrolledJdbcRepo.getStudentsEnrolledInCourse(otherCourse).size() - enrolledJdbcRepo.getStudentsEnrolledInCourse(course).size();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                    } catch (SQLException | IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                     return 0;
@@ -61,6 +49,7 @@ public class CourseController {
         courseJdbcRepo.closeConnection(connection);
         return courses;
     }
+
 
     /**
      * filters the courses with the specified number of credits
@@ -80,12 +69,15 @@ public class CourseController {
         return courses;
     }
 
+
     public Course findOne(Long id) throws NullValueException, SQLException, IOException, ClassNotFoundException {
         return courseJdbcRepo.findOne(id);
     }
 
+
     public List<Course> findAll() throws SQLException, IOException, ClassNotFoundException {
-        return courseJdbcRepo.findAll();
+        Connection connection = courseJdbcRepo.openConnection();
+        return courseJdbcRepo.readDataFromDatabase(connection);
     }
 
 
@@ -96,7 +88,7 @@ public class CourseController {
      * @return result of method save in CourseRepository
      * @throws NullValueException      if the parameter object is null
      * @throws IOException             if the file is invalid
-     * @throws InvalidTeacherException course has a teacher who doesn't exist in teacherRepolist
+     * @throws InvalidTeacherException course has a teacher who doesn't exist in teacherRepoList
      * @throws InvalidStudentException course has a student in studentList who doesn't exist in studentRepoList
      */
     public Course save(Course course) throws NullValueException, InvalidTeacherException, IOException, InvalidStudentException, SQLException, ClassNotFoundException {
@@ -110,9 +102,9 @@ public class CourseController {
                 throw new InvalidTeacherException("Invalid teacher");
         }
 
-        Course result = courseJdbcRepo.save(course);
-        return result;
+        return courseJdbcRepo.save(course);
     }
+
 
     /**
      * deletes the object with the parameter id from repoList. Returns the result of method delete in CourseRepository
@@ -129,12 +121,13 @@ public class CourseController {
 
         Course result = courseJdbcRepo.findOne(id);
         if (result == null)
-            return result;
+            return null;
 
         enrolledJdbcRepo.deleteEnrolledStudentsFromCourse(id);
         courseJdbcRepo.delete(id);
         return result;
     }
+
 
     public Course update(Course course) throws IOException, NullValueException, SQLException, ClassNotFoundException {
         return courseJdbcRepo.update(course);

@@ -3,6 +3,7 @@ package repository;
 import exceptions.NullValueException;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -60,4 +61,10 @@ public interface ICrudRepository<T> {
      * @return the number of elements
      */
     int size() throws SQLException, ClassNotFoundException, IOException;
+
+    Connection openConnection() throws ClassNotFoundException, SQLException, IOException;
+
+    void closeConnection(Connection connection) throws SQLException;
+
+    abstract List<T> readDataFromDatabase(Connection connection) throws SQLException, IOException, ClassNotFoundException;
 }

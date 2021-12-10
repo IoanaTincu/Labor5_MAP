@@ -14,7 +14,7 @@ import java.util.List;
 public class StudentJdbcRepository extends JdbcRepository<Student> {
 
     @Override
-    public List<Student> readDataFromDatabase(Connection connection) throws SQLException, IOException, ClassNotFoundException {
+    public List<Student> readDataFromDatabase(Connection connection) {
         List<Student> databaseStudents = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM students");
@@ -144,4 +144,6 @@ public class StudentJdbcRepository extends JdbcRepository<Student> {
         closeConnection(connection);
         return entity;
     }
+
+
 }

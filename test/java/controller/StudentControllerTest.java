@@ -79,7 +79,7 @@ class StudentControllerTest {
 
     @Test
     @Description("Should throw a NullValueException because the parameter course is null")
-    void delete_student_null() throws IOException {
+    void delete_student_null() {
         assertThrows(NullValueException.class, () -> studentController.delete(null));
     }
 
