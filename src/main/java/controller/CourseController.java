@@ -76,8 +76,7 @@ public class CourseController {
 
 
     public List<Course> findAll() throws SQLException, IOException, ClassNotFoundException {
-        Connection connection = courseJdbcRepo.openConnection();
-        return courseJdbcRepo.readDataFromDatabase(connection);
+        return courseJdbcRepo.findAll();
     }
 
 
