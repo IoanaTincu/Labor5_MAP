@@ -147,5 +147,4 @@ class CourseControllerTest {
     void update_course_null() {
         assertThrows(NullValueException.class, () -> courseController.update(null));
     }
-
 }

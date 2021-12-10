@@ -36,7 +36,7 @@ public class StudentController {
         Connection connection = studentJdbcRepo.openConnection();
 
         List<Student> students = studentJdbcRepo.readDataFromDatabase(connection).stream()
-                // .sorted((student, otherStudent) -> otherStudent.getTotalCredits() - student.getTotalCredits())
+                //.sorted((student, otherStudent) -> otherStudent.getTotalCredits() - student.getTotalCredits())
                 .sorted(Comparator.comparingInt(Student::getTotalCredits).reversed())
                 .collect(Collectors.toList());
 
