@@ -2,19 +2,15 @@ package controller;
 
 import com.sun.org.glassfish.gmbal.Description;
 import exceptions.InvalidCourseException;
-import exceptions.InvalidStudentException;
-import exceptions.InvalidTeacherException;
 import exceptions.NullValueException;
 import model.Course;
 import model.Student;
-import model.Teacher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import repository.CourseJdbcRepository;
 import repository.EnrolledJdbcRepository;
 import repository.StudentJdbcRepository;
-import repository.TeacherJdbcRepository;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -33,9 +29,6 @@ class StudentControllerTest {
     EnrolledJdbcRepository enrolledJdbcRepo = Mockito.mock(EnrolledJdbcRepository.class);
 
     Course course1 = new Course(1141, "Algebra liniara", 1200, 45, 18);
-    Course course2 = new Course(653, "Analiza matematica", 1200, 45, 11);
-    Course course3 = new Course(807, "Programare distribuita", 120, 88, 8);
-    Teacher teacher = new Teacher(1200, "Mugur", "Acu");
     Student student1 = new Student(1216, "Matei", "Stroia", 11);
     Student student2 = new Student(113, "Luca", "Tompea", 12);
     Student student3 = new Student(113, "Moise", "Gabriel", 53);
@@ -93,7 +86,7 @@ class StudentControllerTest {
     @Test
     @Description("Should return null because there is no student in the repository with the specified id")
     void delete_student_not_exists() throws IOException, NullValueException, SQLException, ClassNotFoundException {
-        assertEquals(studentController.delete(1217L), null);
+        assertNull(studentController.delete(1217L));
     }
 
     @Test

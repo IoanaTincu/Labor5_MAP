@@ -2,8 +2,6 @@ package controller;
 
 import com.sun.org.glassfish.gmbal.Description;
 import exceptions.InvalidCourseException;
-import exceptions.InvalidStudentException;
-import exceptions.InvalidTeacherException;
 import exceptions.NullValueException;
 import model.Course;
 import model.Student;
@@ -14,7 +12,6 @@ import org.mockito.Mockito;
 import repository.CourseJdbcRepository;
 import repository.EnrolledJdbcRepository;
 import repository.StudentJdbcRepository;
-import repository.TeacherJdbcRepository;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -23,13 +20,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+/*import static org.junit.jupiter.api.Assertions.*;
 
-class TeacherControllerTest {
+class StudentControllerTest {
 
-    TeacherController teacherController;
+    StudentController studentController;
     CourseJdbcRepository courseJdbcRepo = Mockito.mock(CourseJdbcRepository.class);
-    TeacherJdbcRepository teacherJdbcRepo = Mockito.mock(TeacherJdbcRepository.class);
+    StudentJdbcRepository studentJdbcRepo = Mockito.mock(StudentJdbcRepository.class);
     EnrolledJdbcRepository enrolledJdbcRepo = Mockito.mock(EnrolledJdbcRepository.class);
 
     Course course1 = new Course(1141, "Algebra liniara", 1200, 45, 18);
@@ -46,9 +43,9 @@ class TeacherControllerTest {
 
     @BeforeEach
     void setUp() throws SQLException, IOException, ClassNotFoundException, NullValueException {
-        teacherController = new TeacherController(teacherJdbcRepo, enrolledJdbcRepo);
-        Mockito.when(teacherJdbcRepo.openConnection()).thenReturn(connection);
-        Mockito.when(teacherJdbcRepo.readDataFromDatabase(connection)).thenReturn(students);
+        studentController = new StudentController(studentJdbcRepo, courseJdbcRepo, enrolledJdbcRepo);
+        Mockito.when(studentJdbcRepo.openConnection()).thenReturn(connection);
+        Mockito.when(studentJdbcRepo.readDataFromDatabase(connection)).thenReturn(students);
         Mockito.when(courseJdbcRepo.findOne(1141L)).thenReturn(course1);
         Mockito.when(enrolledJdbcRepo.getStudentsEnrolledInCourse(course1)).thenReturn(new ArrayList<>(Arrays.asList(1216L, 113L)));
         Mockito.when(studentJdbcRepo.save(student3)).thenReturn(student3);
@@ -60,9 +57,23 @@ class TeacherControllerTest {
     }
 
     @Test
-    @Description("Should return the teacher because the id already exists in the repository")
-    void save_teacher_id_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException, InvalidCourseException {
-        assertEquals(teacherController.save(student3), student3);
+    void sortStudentsByTotalCredits() throws SQLException, IOException, ClassNotFoundException {
+        List<Student> sortedStudents = studentController.sortStudentsByTotalCredits();
+        assertEquals(sortedStudents.get(0).getId(), 113);
+        assertEquals(sortedStudents.get(1).getId(), 1216);
+    }
+
+    @Test
+    @Description("Should return the students with id 1216 and 113 because they both attend the course with id 1141")
+    void filterStudentsAttendingCourse() throws SQLException, IOException, ClassNotFoundException, NullValueException {
+        List<Student> filteredStudents = studentController.filterStudentsAttendingCourse(1141L);
+        assertEquals(filteredStudents.size(), 2);
+    }
+
+    @Test
+    @Description("Should return the student because the id already exists in the repository")
+    void save_student_id_exists() throws SQLException, IOException, ClassNotFoundException, NullValueException, InvalidCourseException {
+        assertEquals(studentController.save(student3), student3);
     }
     @Test
     @Description("Should return null because the course has been saved")
@@ -88,4 +99,4 @@ class TeacherControllerTest {
         Student student = studentController.findOne(1216L);
         assertEquals(studentController.delete(1216L), student);
     }
-}
+}*/

@@ -1,6 +1,5 @@
 package controller;
 
-import com.sun.java.swing.plaf.motif.MotifCheckBoxMenuItemUI;
 import com.sun.org.glassfish.gmbal.Description;
 import exceptions.InvalidStudentException;
 import exceptions.InvalidTeacherException;
@@ -8,7 +7,6 @@ import exceptions.NullValueException;
 import model.Course;
 import model.Student;
 import model.Teacher;
-import org.junit.jupiter.api.Test;
 import repository.CourseJdbcRepository;
 import org.mockito.Mockito;
 import repository.EnrolledJdbcRepository;
@@ -41,8 +39,6 @@ class CourseControllerTest {
     Course newCourse2 = new Course(653, "Analiza matematica", 945, 48, 6);
 
     Teacher teacher = new Teacher(1200, "Mugur", "Acu");
-    Student student1 = new Student(1216, "Matei", "Stroia", 11);
-    Student student2 = new Student(113, "Luca", "Tompea", 12);
     Connection connection;
     List<Course> courses = new ArrayList<>(Arrays.asList(course1, course3, course2));
 
